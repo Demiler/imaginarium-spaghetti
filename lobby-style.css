@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  font-family: "Hack";
+  background-color: #232333;
+  color: #eee;
+}
+
+header {
+  display: flex;
+  height: 30px;
+  background-color: #313141;
+  align-items: center;
+}
+
+header .nameTag {
+  margin-right: auto;
+}
+
+header .settings, header .sound {
+  margin-right: 10px;
+  background-color: #212131;
+  padding: 3px;
+  border-radius: 5px;
+}
+
+
+.container {
+  width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+.playerList {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 100px 0 100px;
+  grid-gap: 20px;
+  padding: 10px;
+  background-color: #313141;
+  border-radius: 10px;
+}
+
+.playerList .player {
+  display: flex;
+  align-items: center;
+}
+
+.playerList .playerImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+  margin-right: 10px;
+  background-color: #212121;
+}
+
+.playerList .playerName {
+  font-size: 20px;
+}
+
+.playerList .player {
+  padding: 5px;
+  position: relative;
+}
+
+.playerList .ready {
+  /*background-color: #282838;*/
+  background-color: #2b5a2b;
+  border-radius: 5px 5px 5px 10px;
+}
+
+/*.playerList .ready::before {*/
+  /*content: url("images/ready2.svg");*/
+  /*display: block;*/
+  /*width: 20px;*/
+  /*height: 20px;*/
+  /*position: absolute;*/
+  /*bottom: 0;*/
+  /*left: 0;*/
+  /*border: 2px solid #0f0;*/
+  /*border-radius: 20px;*/
+/*}*/
+
+/*.playerList .ready .playerName {*/
+  /*color: #5f5;*/
+/*}*/
+
+.readyButton {
+  width: 200px;
+  height: 50px;
+  font-size: 30px;
+  border-radius: 10px;
+  margin-top: 10px;
+  background-color: #484876;
+  color: white;
+  border: none;
+  border-bottom: 5px solid #383866;
+  transition: .1s;
+
+  position: absolute;
+  bottom: 50px;
+  left: calc(50% - 100px);
+  text-transform: uppercase;
+}
+
+.readyButton:hover, .readyButtonD:focus {
+  filter: brightness(1.5);
+  outline: none;
+}
+
+.readyButton:active { border-bottom-width: 0; }
+
+.playerCounter {
+  position: absolute;
+  background-color: #111121;
+  min-width: 50px;
+  min-height: 50px;
+  bottom: -50px;
+  left: calc(50% - 25px);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  font-size: 30px;
+}
