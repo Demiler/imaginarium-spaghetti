@@ -92,6 +92,10 @@ body {
   color: #afa;
 }
 
+.starPlayer .spacer {
+  margin-right: 10px;
+}
+
 /*star player completed*/
 
 .cardsContainer {
