@@ -15,19 +15,22 @@ body {
   background-color: #333343;
 }
 
-/*.container {*/
-  /*display: grid;*/
-  /*grid-template-columns: repeat(3, 1fr);*/
-  /*grid-gap: 10px;*/
-/*}*/
+.container {
+  display: grid;
+  grid-gap: 10px;
+  /*grid-template-areas: */
+    /*"sidebar starPlayer starPlayer starPlayer starPlayer starPlayer"*/
+    /*"sidebar cards cards cards cards cards"*/
+  grid-template-columns: minmax(200px, 1fr) 5fr;
+}
 
-.container > * { display: none }
 
 .sidebar {
-  max-width: 200px;
-  width: auto;
   display: flex;
   flex-direction: column;
+}
+
+.sidebar .playerList {
   background-color: #313141;
   padding: 10px;
   border-radius: 5px;
@@ -63,4 +66,60 @@ body {
   height: 40px;
   border-radius: 40px;
   margin-right: 10px;
+}
+
+/*sidebar completed*/
+
+.starPlayer {
+  display: flex;
+  align-items: center;
+  padding-bottom: 5px;
+}
+
+.starPlayer .starPlayerImage {
+  width: 30px;
+  height: 30px;
+  border-radius: 40px;
+  margin-right: 10px;
+}
+
+.starPlayer .starPlayerName {
+  margin-right: 10px;
+}
+
+.starPlayer .playerScore {
+  background-color: #080818;
+  padding: 4px;
+  border-radius: 50px;
+  text-align: center;
+}
+
+.starPlayer .starPlayerIdea {
+  width: 80%;
+  border-bottom: 2px solid #313141;
+}
+
+.starPlayer .starPlayerIdea.thinking {
+  color: #afa;
+}
+
+/*star player completed*/
+
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cardsContainer .card {
+  margin: 10px;
+  transition: .1s;
+}
+
+.cardsContainer img {
+  width: 280px;
+}
+
+.cardsContainer .card:hover {
+  transform: scale(1.2);
 }
