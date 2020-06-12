@@ -43,6 +43,8 @@ h1 {
   padding: 10px;
   background-color: #313141;
   border-radius: 10px;
+  overflow-y: auto;
+  max-height: 400px;
 }
 
 .playerList .player {
@@ -67,23 +69,23 @@ h1 {
   position: relative;
 }
 
-.playerList .ready {
-  /*background-color: #282838;*/
-  background-color: #2b5a2b;
-  border-radius: 5px 5px 5px 10px;
-}
-
-/*.playerList .ready::before {*/
-  /*content: url("images/ready2.svg");*/
-  /*display: block;*/
-  /*width: 20px;*/
-  /*height: 20px;*/
-  /*position: absolute;*/
-  /*bottom: 0;*/
-  /*left: 0;*/
-  /*border: 2px solid #0f0;*/
-  /*border-radius: 20px;*/
+/*.playerList .ready {*/
+  /*[>background-color: #282838;<]*/
+  /*background-color: #2b5a2b;*/
+  /*border-radius: 5px 5px 5px 10px;*/
 /*}*/
+
+.playerList .ready::before {
+  content: url("images/ready2.svg");
+  display: block;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border-radius: 20px;
+  filter: hue-rotate(120deg);
+}
 
 /*.playerList .ready .playerName {*/
   /*color: #5f5;*/
@@ -115,16 +117,16 @@ h1 {
 .readyButton:active { border-bottom-width: 0; }
 
 .playerCounter {
-  position: absolute;
-  background-color: #111121;
-  min-width: 50px;
-  min-height: 50px;
-  bottom: -100px;
-  left: calc(50% - 25px);
+  background-color: #313141;
+  width: 30%;
+  height: 50px;
+  /*bottom: -100px;*/
+  /*left: calc(50% - 25px);*/
+  margin: 0 auto;
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 30px;
+  border-radius: 0 0 30px 30px;
   font-size: 30px;
 }

@@ -7,14 +7,14 @@ body {
 .container {
   display: grid;
   grid-gap: 10px;
-  /*grid-template-areas: */
-    /*"sidebar starPlayer starPlayer starPlayer starPlayer starPlayer"*/
-    /*"sidebar cards cards cards cards cards"*/
-  grid-template-columns: minmax(200px, 1fr) 5fr;
+  grid-template-columns: 240px 5fr;
+  grid-template-areas:
+    "sdbar starp"
+    "sdbar cards"
 }
 
-
 .sidebar {
+  grid-area: sdbar;
   display: flex;
   flex-direction: column;
 }
@@ -45,9 +45,10 @@ body {
   margin-left: auto;
   background-color: #282838;
   padding: 8px;
-  min-width: 20px;
   border-radius: 50px;
   text-align: center;
+  width: 20px;
+  height: 20px;
 }
 
 .sidebar .playerImage {
@@ -60,15 +61,24 @@ body {
 /*sidebar completed*/
 
 .starPlayer {
+  grid-area: starp;
   display: flex;
   align-items: center;
-  padding-bottom: 5px;
+  border-bottom: 2px solid #414181;
+  border-radius: 0 0 0 20px;
+}
+
+.starPlayer .starPlayerWrap {
+  display: flex;
+  background-color: #414181;
+  align-items: center;
+  border-radius: 20px 20px 0 20px;
 }
 
 .starPlayer .starPlayerImage {
   width: 30px;
   height: 30px;
-  border-radius: 40px;
+  border-radius: 40px 0 0 40px;
   margin-right: 10px;
 }
 
@@ -77,15 +87,14 @@ body {
 }
 
 .starPlayer .playerScore {
-  background-color: #080818;
-  padding: 4px;
-  border-radius: 50px;
-  text-align: center;
+  padding-right: 8px;
 }
 
 .starPlayer .starPlayerIdea {
-  width: 80%;
-  border-bottom: 2px solid #313141;
+  /*width: 80%;*/
+  /*border-bottom: 2px solid #313141;*/
+  align-self: flex-end;
+  padding-bottom: 2px;
 }
 
 .starPlayer .starPlayerIdea.thinking {
@@ -93,12 +102,14 @@ body {
 }
 
 .starPlayer .spacer {
-  margin-right: 10px;
+  margin-right: 2px;
+  opacity: 0;
 }
 
 /*star player completed*/
 
 .cardsContainer {
+  grid-area: cards;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -107,14 +118,65 @@ body {
 .cardsContainer .card {
   margin: 10px;
   transition: .1s;
-  width: 280px;
+  width: 21vh;
+  /*width: 280px;*/
+  height: 100%;
+  border-radius: 10px;
 }
 
 .cardsContainer img {
   width: inherit;
-  border-radius: 10px;
+  border-radius: inherit;
 }
 
 .cardsContainer .card:hover {
   transform: scale(1.2);
+}
+
+.sideblock {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 10px;
+  right: 5px;
+}
+
+.sideblock div {
+  width: 30px;
+  height: 30px;
+}
+
+.sideblock .sound {
+/*.settings {*/
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.sideblock .sound {
+  filter: invert(0.8);
+}
+
+.settingsWrap {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #000000a0;
+  display: flex; 
+  align-items: center;
+
+  display: none;
+}
+
+.floatSettings {
+  width: 80%;
+  height: 80%;
+  margin: 0 auto;
+  padding: 5px;
+  border-radius: 5px;
+  background: #515161;
+
+
+  text-align: center;
 }
