@@ -2,6 +2,9 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Imaginarium</title>
+    <link rel="icon" href="images/icon.png" type="image/icon type">
+    <link rel="shortcut icon" href="images/icon2.png"/>
     <link rel="stylesheet" href="lobby-style.css" type="text/css">
     <link rel="stylesheet" href="scrollbar.css" type="text/css">
     <script src="lobby-script.js" async></script>
@@ -42,17 +45,17 @@
 
       <div class="player ready">
         <img class="playerImage" src="images/avatars/5.png">
-        <div class="playerName">ReFLex</div>
+        <div class="playerName">DgReFLex</div>
       </div>
 
     </div>
 
     <div class="playerCounter">
-      <span class="ready">2</span>
-       / 
+      <span class="ready" id="ready">2</span>
+      <span>/</span>
       <span class="total">5</span>
     </div>
-    <button class="readyButton">ready</button>
+    <button class="readyButton" onclick="ImReady()">ready</button>
   </div>
 
   </body>
