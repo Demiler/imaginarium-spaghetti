@@ -21,8 +21,8 @@ class Player {
 let players = [];
 players.push(new Player("you", "0.png", "notReady", 0));
 players.push(new Player("player1", "0.png", "ready", 0));
-players.push(new Player("player2", "0.png", "notReady", 0));
-players.push(new Player("player3", "0.png", "notReady", 0));
+players.push(new Player("player2", "0.png", "ready", 0));
+players.push(new Player("player3", "0.png", "ready", 0));
 
 function sleep(ms) {
   return new Promise(
@@ -49,21 +49,25 @@ class ImApp extends LitElement {
       gameLeader: { type: Player },
       gameLeaderId: { type: Number },
       gameQueue: { type: Array },
+      hostCards: { type: Array },
     };
   }
 
   constructor() {
     super();
-    this.state = "lobby";
     this.players = players;
     this.host = players[0];
     this.lobbyBtn = false;
-    this.lobbyLock = false;
+    this.checkLock = false;
+    //this.state = "game guess";this.initGame();
+    this.state = 'lobby';
   }
 
   render() {
     switch (this.state) {
       case 'lobby': this.lobbyChecker(); return this.lobby(); break;
+      case 'game guess': this.gameChecker(); return this.gameGuess(); break;
+      case 'game wait': this.gameChecker(); return this.gameWait(); break;
       default: return html`not found`; 
     }
   }
@@ -72,10 +76,60 @@ class ImApp extends LitElement {
   }
 
   initGame() {
-    this.gameQueue = shuffle(this.players);
+    this.gameQueue = this.players.slice();
+    //shuffle(this.gameQueue);
+    this.gameQueue.map(player => player.status = 'waiting');
     this.gameLeaderId = 0;
     this.gameLeader = this.gameQueue[0];
     this.state = this.gameLeader === this.host ? 'game guess' : 'game wait';
+    this.gameLeader.status = 'guessing';
+    this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
+                       "card4.jpeg", "card5.jpeg"];
+  }
+
+  gameGuess() {
+    return html`
+    <div class="gameContainer">
+      <div class="sidebar">
+        <div class="playerList">
+          ${this.players.filter(player => player !== this.gameLeader).map(player => html`
+            <div class="player ${player.status}">
+              <img class="playerImage" src="../images/avatars/${player.icon}">
+              <div class="playerSnN">
+                <div class="playerName">${player.name}</div>
+                <div class="playerStatus">${player.status}</div>
+              </div>
+              <span class="playerScore">${player.score}</span>
+            </div>
+          `)}
+        </div>
+      </div>
+
+      <div class="leader">
+        <div class="leaderWrap">
+          <img class="leaderImage" src="../images/avatars/${this.gameLeader.icon}">
+          <span class="leaderName">${this.gameLeader.name}</span>
+          <span class="playerScore">${this.gameLeader.score}</span>
+        </div>
+        <span class="spacer">:</span>
+        <span class="leaderGuess ${this.gameLeader.status}">${this.gameLeader.status}</span>
+      </div>
+
+      <div class="cardsContainer">
+        ${this.hostCards.map(card => html`
+          <div class="card">
+            <img class="cardImage" src="../images/cards/${card}">
+          </div>
+        `)}
+      </div>
+    </div>
+    `;
+  }
+
+  gameWait() {
+    return html`
+    uh oh
+    `;
   }
 
   async lobbyChecker() {
@@ -83,8 +137,8 @@ class ImApp extends LitElement {
     this.lobbyLock = true;
     while (
       this.players.filter(player => player.status === 'notReady').length !== 0
-    ) await sleep(1000);
-    initGame();
+    ) await sleep(500);
+    this.initGame();
     this.checkLock = false;
   }
 
@@ -96,7 +150,7 @@ class ImApp extends LitElement {
         <span class="sound">Sound: On</span>
       </header>
   
-      <div class="container">
+      <div class="lobbyContainer">
         <h1>List of players</h1>
 
         <div class="playerList">
