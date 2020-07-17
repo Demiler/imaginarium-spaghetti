@@ -76,7 +76,7 @@ h1 {
 /*}*/
 
 .playerList .ready::before {
-  content: url("images/ready2.svg");
+  content: url("../images/ready2.svg");
   display: block;
   width: 20px;
   height: 20px;

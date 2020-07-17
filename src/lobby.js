@@ -1,8 +1,5 @@
 import { LitElement, html } from 'lit-element'; 
 
-let playersCounter = 0;
-
-//class Player extends LitElement {
 class Player {
   static get properties() {
     return {
@@ -12,27 +9,31 @@ class Player {
       score: { type: Number }
     };
   }
-  constructor() {
-    //super();
-    playersCounter++;
-    this.name = "player" + playersCounter;
-    this.icon = "0.png";
-    this.status = "";
-    this.score = 0;
+
+  constructor(name, icon, status, score) {
+    this.name = name;
+    this.icon = icon;
+    this.status = status;
+    this.score = score;
   }
-  //createRenderRoot() { return this }
 }
+
+let players = [];
+players.push(new Player("you", "0.png", "notReady", 0));
+players.push(new Player("player1", "0.png", "notReady", 0));
+players.push(new Player("player2", "0.png", "notReady", 0));
+players.push(new Player("player3", "0.png", "notReady", 0));
 
 class Players extends LitElement {
   static get properties() {
     return {
-      players: { type: Array }
+      players: { type: Array } //host player is always first
     };
   }
 
   constructor() {
     super();
-    this.players = [];
+    this.players = players;
   }
 
   render() {
@@ -54,6 +55,7 @@ class Lobby extends LitElement {
     return {
       name: { type: String },
       over: { type: Object },
+      host: { type: Object },
       btn: { type: Boolean }
     };
   }
@@ -62,6 +64,7 @@ class Lobby extends LitElement {
     super();
     this.name = "lobby";
     this.over = { pList: new Players(), btnState: false };
+    this.host = players[0];
     this.btn = false;
   }
 
@@ -85,15 +88,16 @@ class Lobby extends LitElement {
           </span>
         </div>
 
-        <button class="readyButton ${this.btn ? "ready" : "notReady"}"
+        <button class="readyButton ${this.host.status}"
         @click="${this.readyButton}">
-          ${this.btn ? "not ready" : "ready"}
+          ${this.host.status === "ready" ? "not ready" : "ready"}
         </button>
       </div>
     `;
   }
 
   readyButton() {
+    this.host.status = (this.host.status === "ready" ? "notReady" : "ready");
     this.btn = !this.btn;
   }
 
