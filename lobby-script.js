@@ -1,4 +1,4 @@
-import * as mm from './modules/my-module.js'
+import * as mm from '/home/demiler/projects/imaginarium/modules/my-module.js'
 
 playersReady = 0;
 
