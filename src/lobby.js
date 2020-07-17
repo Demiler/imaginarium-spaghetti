@@ -20,7 +20,7 @@ class Player {
 
 let players = [];
 players.push(new Player("you", "0.png", "notReady", 0));
-players.push(new Player("player1", "0.png", "notReady", 0));
+players.push(new Player("player1", "0.png", "ready", 0));
 players.push(new Player("player2", "0.png", "notReady", 0));
 players.push(new Player("player3", "0.png", "notReady", 0));
 
@@ -82,7 +82,7 @@ class Lobby extends LitElement {
         <im-players class="playerList"></im-players>
         <div class="playerCounter">
           <span class="ready">
-            ${this.over.pList.players.filter(player => player.state === "ready").length}
+            ${this.over.pList.players.filter(player => player.status === "ready").length}
           </span>/<span class="total">
             ${this.over.pList.players.length}
           </span>
