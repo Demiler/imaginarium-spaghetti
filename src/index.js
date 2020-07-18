@@ -1,2 +1,2 @@
-import './lobby.js'
+import './script.js'
 //import './test.js'
