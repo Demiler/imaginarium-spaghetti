@@ -2,9 +2,10 @@
   "name": "imaginarium",
   "version": "1.0.0",
   "description": "",
-  "main": "lobby-script.js",
+  "main": "src/script.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "dev": "webpack-dev-server --entry ./src/script.js --output-filename ./dist/main.js"
   },
   "repository": {
     "type": "git",
@@ -18,14 +19,11 @@
   },
   "homepage": "https://github.com/Demiler/imaginarium#readme",
   "dependencies": {
-    "lit-element": "^2.3.1",
-    "vaadin-button": "^2.1.0-alpha3",
-    "vaadin-checkbox": "^1.0.0-alpha5",
-    "vaadin-radio-button": "^1.0.0-alpha2",
-    "vaadin-text-field": "^1.0.0"
+    "lit-element": "^2.3.1"
   },
   "devDependencies": {
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }
