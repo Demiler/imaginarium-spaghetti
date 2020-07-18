@@ -134,13 +134,28 @@ class ImApp extends LitElement {
 
       <div class="cardsContainer">
         ${this.hostCards.map(card => html`
-          <div class="card" @click="${this.cardChoose}">
-            <img class="cardImage" src="../img/cards/${card}">
+          <div class="card preview" @click="${this.preview}">
+            <div class="wrap">
+              <img class="cardImage" src="../img/cards/${card}">
+            </div>
           </div>
         `)}
       </div>
     </div>
     `;
+  }
+
+  preview(event) {
+    console.log(event.target);
+    if (event.target.tagName === 'DIV') {
+      event.currentTarget.classList.remove("magnify");
+      event.currentTarget.classList.add("preview");
+    }
+    else if (event.target.tagName === 'IMG') {
+      event.currentTarget.classList.remove("preview");
+      event.currentTarget.classList.add("magnify");
+    }
+    else console.log("¯\_(ツ)_/¯");
   }
 
   updateGuess(event) {
