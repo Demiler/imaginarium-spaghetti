@@ -100,7 +100,7 @@ class ImApp extends LitElement {
         <div class="playerList">
           ${this.players.filter(player => player !== this.gameLeader).map(player => html`
             <div class="player ${player.status}">
-              <img class="playerImage" src="../images/avatars/${player.icon}">
+              <img class="playerImage" src="../img/avatars/${player.icon}">
               <div class="playerSnN">
                 <div class="playerName">${player.name}</div>
                 <div class="playerStatus">${player.status}</div>
@@ -120,14 +120,14 @@ class ImApp extends LitElement {
 
       <div class="leader">
         <div class="leaderWrap">
-          <img class="leaderImage" src="../images/avatars/${this.gameLeader.icon}">
+          <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
           <span class="leaderName">${this.gameLeader.name}</span>
           <span class="playerScore">${this.gameLeader.score}</span>
         </div>
         <div class="leaderControl" @keyup="${this.keyListener}">
           <input class="guessField" placeholder="Enter your guess"
             value="${this.hostGuess}" @change="${this.updateGuess}">
-          <button class="goButton">Go?</button>
+          <button class="goButton">Go</button>
         </div>
         <hr class="leaderUnderline">
       </div>
@@ -135,7 +135,7 @@ class ImApp extends LitElement {
       <div class="cardsContainer">
         ${this.hostCards.map(card => html`
           <div class="card" @click="${this.cardChoose}">
-            <img class="cardImage" src="../images/cards/${card}">
+            <img class="cardImage" src="../img/cards/${card}">
           </div>
         `)}
       </div>
@@ -167,7 +167,7 @@ class ImApp extends LitElement {
     uh oh
       <div class="leader">
         <div class="leaderWrap">
-          <img class="leaderImage" src="../images/avatars/${this.gameLeader.icon}">
+          <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
           <span class="leaderName">${this.gameLeader.name}</span>
           <span class="playerScore">${this.gameLeader.score}</span>
         </div>
@@ -201,7 +201,7 @@ class ImApp extends LitElement {
         <div class="playerList">
           ${this.players.map(player => html`
             <div class="player ${player.status}">
-              <img class="playerImage" src="../images/avatars/${player.icon}">
+              <img class="playerImage" src="../img/avatars/${player.icon}">
               <div class="playerName">${player.name}</div>
             </div>
           `)}
