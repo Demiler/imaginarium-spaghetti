@@ -2,7 +2,7 @@
   "name": "imaginarium",
   "version": "1.0.0",
   "description": "",
-  "main": "src/script.js",
+  "main": "src/app.js",
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server",
@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/Demiler/imaginarium#readme",
   "dependencies": {
-    "lit-element": "^2.3.1"
+    "lit-element": "^2.3.1",
+    "ws": "^7.3.1"
   },
   "devDependencies": {
     "css-loader": "^3.6.0",
