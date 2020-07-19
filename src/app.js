@@ -33,8 +33,9 @@ class ImApp extends LitElement {
 
   constructor() {
     super();
-    this.api = new Api();
     this.players = players;
+    this.api = new Api();
+    this.api.on('newPlayer', (player) => this.players.push(player));
     this.host = players[0];
     this.lobbyBtn = false;
     this.checkLock = false;
