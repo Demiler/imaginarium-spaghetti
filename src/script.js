@@ -64,9 +64,10 @@ class ImApp extends LitElement {
     this.lobbyBtn = false;
     this.checkLock = false;
     this.leaderGuess = "";
-    //this.state = "game guess";this.initGame();
     //this.state = 'lobby';
-    this.state = 'game turn';this.initGameTurn(this.host, "what ever");
+    //this.state = "game guess";this.initGameGuess();
+    //this.state = 'game turn';this.initGameTurn(this.host, "what ever");
+    this.state = 'game think';this.initGameThink();
   }
 
   render() {
@@ -75,28 +76,9 @@ class ImApp extends LitElement {
       case 'game guess': return this.gameGuess(); break;
       case 'game wait': return this.gameWait(); break;
       case 'game turn': this.gameTurnChecker(); return this.gameTurn(); break;
+      case 'game think': return this.gameThink(); break;
       default: return html`not found`; 
     }
-  }
-
-  async gameTurnChecker() {
-  }
-
-  initGame() {
-    if (this.initLock === true) return;
-    this.initLock = true;
-    this.gameQueue = this.players.slice();
-    //shuffle(this.gameQueue);
-    this.gameQueue.map(player => player.status = 'waiting');
-    this.gameLeaderId = 0;
-    this.gameLeader = this.gameQueue[0];
-    this.state = this.gameLeader === this.host ? 'game guess' : 'game wait';
-    this.gameLeader.status = 'guessing';
-    this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
-                       "card4.jpeg", "card5.jpeg"];
-    this.leaderGuess = '';
-    this.updateGoBtn(false, false);
-    this.initLock = false;
   }
 
   gameDrawSidebar() {
@@ -116,6 +98,48 @@ class ImApp extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  gameDrawLeader() {
+    return html`
+    <div class="leader">
+      <div class="leaderWrap">
+        <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
+        <span class="leaderName">${this.gameLeader.name}</span>
+        <span class="playerScore">${this.gameLeader.score}</span>
+      </div>
+      <div class="leaderGuess">${this.leaderGuess}</div>
+      <hr class="leaderUnderline">
+    </div>
+    `;
+  }
+
+  initGameThink() {
+  }
+
+  gameThink() {
+    return html`
+    <div class="gameContainer">
+      ${this.gameDrawSidebar()}
+    </div>
+    `;
+  }
+
+  initGameGuess() {
+    if (this.initLock === true) return;
+    this.initLock = true;
+    this.gameQueue = this.players.slice();
+    //shuffle(this.gameQueue);
+    this.gameQueue.map(player => player.status = 'waiting');
+    this.gameLeaderId = 0;
+    this.gameLeader = this.gameQueue[0];
+    this.state = this.gameLeader === this.host ? 'game guess' : 'game wait';
+    this.gameLeader.status = 'guessing';
+    this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
+                       "card4.jpeg", "card5.jpeg"];
+    this.leaderGuess = '';
+    this.updateGoBtn(false, false);
+    this.initLock = false;
   }
 
   gameGuess() {
@@ -154,20 +178,6 @@ class ImApp extends LitElement {
     `;
   }
 
-  gameDrawLeader() {
-    return html`
-    <div class="leader">
-      <div class="leaderWrap">
-        <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
-        <span class="leaderName">${this.gameLeader.name}</span>
-        <span class="playerScore">${this.gameLeader.score}</span>
-      </div>
-      <div class="leaderGuess">${this.leaderGuess}</div>
-      <hr class="leaderUnderline">
-    </div>
-    `;
-  }
-
   async test() {
     await sleep(500);
     this.players[3].status = 'waiting';
@@ -177,7 +187,7 @@ class ImApp extends LitElement {
     this.players[1].status = 'waiting';
     this.requestUpdate()
 
-    await sleep(200);
+    await sleep(1000);
     this.players[2].status = 'waiting';
     this.requestUpdate()
   }
@@ -198,7 +208,8 @@ class ImApp extends LitElement {
       this.players.filter(player => player.status === 'picking').length !== 0
     ) await sleep(500);
     await sleep(1000);
-    this.state = 'go';
+    this.initGameThink();
+    this.state = 'game think';
     this.checkLock = false;
   }
 
@@ -225,7 +236,7 @@ class ImApp extends LitElement {
   async goBtnGo(event) {
     if (this.gameGoBtn === 'go') {
       event.currentTarget.classList.add('yep');
-      initGameTurn(this.hostPlayer, this.leaderGuess);
+      this.initGameTurn(this.host, this.leaderGuess);
       await sleep(1500);
       this.state = 'game turn';
     }
@@ -303,7 +314,7 @@ class ImApp extends LitElement {
     while (
       this.players.filter(player => player.status === 'notReady').length !== 0
     ) await sleep(500);
-    this.initGame();
+    this.initGameGuess();
     this.checkLock = false;
   }
 
