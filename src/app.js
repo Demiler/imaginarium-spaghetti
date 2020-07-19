@@ -6,11 +6,11 @@ import { Api } from './api.js'
 
  
 let players = [];
-players.push(new Player("you", "0.png", "notReady", 0));
-players.push(new Player("player1", "0.png", "ready", 0));
-players.push(new Player("player2", "0.png", "ready", 0));
-players.push(new Player("player3", "0.png", "ready", 0));
-
+//players.push(new Player("you", "0.png", "notReady", 0));
+players.push(new Player("player1", "0.png", "notReady", 0));
+//players.push(new Player("player2", "0.png", "ready", 0));
+//players.push(new Player("player3", "0.png", "ready", 0));
+let api = new Api();
 
 class ImApp extends LitElement {
   static get properties() {
@@ -34,8 +34,13 @@ class ImApp extends LitElement {
   constructor() {
     super();
     this.players = players;
-    this.api = new Api();
-    this.api.on('newPlayer', (player) => this.players.push(player));
+    api.on('newPlayer', (player) => { 
+      //api.send('newPlayerUpdate', this.players);
+      const pl = Player.fromJSON(player);
+      this.players.push(Player.fromJSON(player));
+      this.requestUpdate();
+    });
+    
     this.host = players[0];
     this.lobbyBtn = false;
     this.checkLock = false;

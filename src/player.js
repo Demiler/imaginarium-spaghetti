@@ -14,4 +14,22 @@ export class Player {
     this.status = status;
     this.score = score;
   }
+
+  static toJSON() {
+    return { 
+      name: this.name, 
+      icon: this.icon, 
+      status: this.status, 
+      score: this.score 
+    };
+  }
+
+  static fromJSON(data) {
+    return new Player(
+      data.name, 
+      data.icon, 
+      data.status, 
+      data.score
+  )};
+
 }
