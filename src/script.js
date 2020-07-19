@@ -72,14 +72,14 @@ class ImApp extends LitElement {
   render() {
     switch (this.state) {
       case 'lobby': this.lobbyChecker(); return this.lobby(); break;
-      case 'game guess': this.gameChecker(); return this.gameGuess(); break;
-      case 'game wait': this.gameChecker(); return this.gameWait(); break;
-      case 'game turn': this.gameChecker(); return this.gameTurn(); break;
+      case 'game guess': return this.gameGuess(); break;
+      case 'game wait': return this.gameWait(); break;
+      case 'game turn': this.gameTurnChecker(); return this.gameTurn(); break;
       default: return html`not found`; 
     }
   }
 
-  async gameChecker() {
+  async gameTurnChecker() {
   }
 
   initGame() {
@@ -172,6 +172,14 @@ class ImApp extends LitElement {
     await sleep(500);
     this.players[3].status = 'waiting';
     this.requestUpdate()
+
+    await sleep(500);
+    this.players[1].status = 'waiting';
+    this.requestUpdate()
+
+    await sleep(200);
+    this.players[2].status = 'waiting';
+    this.requestUpdate()
   }
 
   initGameTurn(gameLeader, leaderGuess) {
@@ -181,6 +189,17 @@ class ImApp extends LitElement {
     this.gameLeader.status = 'waiting';
 
     this.test();
+  }
+
+  async gameTurnChecker() {
+    if (this.checkLock === true) return;
+    this.checkLock = true;
+    while (
+      this.players.filter(player => player.status === 'picking').length !== 0
+    ) await sleep(500);
+    await sleep(1000);
+    this.state = 'go';
+    this.checkLock = false;
   }
 
   gameTurn() {
