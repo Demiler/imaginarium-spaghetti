@@ -91,7 +91,9 @@ class ImApp extends LitElement {
     this.gameLeader.status = 'guessing';
     this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
                        "card4.jpeg", "card5.jpeg"];
+    this.hostGuess = '';
     this.initLock = false;
+    this.updateGoBtn(false, false);
   }
 
   gameDrawSidebar() {
@@ -127,54 +129,71 @@ class ImApp extends LitElement {
         <div class="leaderControl" @keyup="${this.keyListener}">
           <input class="guessField" placeholder="Enter your guess"
             value="${this.hostGuess}" @change="${this.updateGuess}">
-          <button class="goButton">Go</button>
         </div>
         <hr class="leaderUnderline">
       </div>
 
       <div class="cardsContainer">
         ${this.hostCards.map(card => html`
-          <div class="card preview" @click="${this.preview}">
+          <div class="card preview" @click="${this.chooseCard}">
             <div class="wrap">
               <img class="cardImage" src="../img/cards/${card}">
             </div>
           </div>
         `)}
       </div>
+      <button class="goButton ${this.gameGoBtn !== 'go' ? 'notReady' : 'ready'}"
+        @click="${this.goBtnGo}">
+        ${this.gameGoBtn}
+      </button>
     </div>
     `;
   }
 
-  preview(event) {
-    console.log(event.target);
-    if (event.target.tagName === 'DIV') {
-      event.currentTarget.classList.remove("magnify");
-      event.currentTarget.classList.add("preview");
+  async goBtnGo(event) {
+    if (this.gameGoBtn === 'go') {
+      event.currentTarget.classList.add('yep');
+      await sleep(1500);
+      this.state = 'game turn';
     }
-    else if (event.target.tagName === 'IMG') {
-      event.currentTarget.classList.remove("preview");
-      event.currentTarget.classList.add("magnify");
-    }
-    else console.log("¯\_(ツ)_/¯");
   }
 
   updateGuess(event) {
     this.hostGuess = event.target.value;
+    this.updateGoBtn(this.hostChoosenCard !== undefined, this.hostGuess !== '');
   }
 
   setGuess() {
+  }
+
+  updateGoBtn(card, guess) {
+    if (card && guess) 
+      this.gameGoBtn = "go";
+    else if (card) 
+      this.gameGoBtn = "guess";
+    else if (guess)
+      this.gameGoBtn = "card";
+    else
+      this.gameGoBtn = "guess & card";
   }
 
   keyListener(event) {
     if (event.key === "Enter") this.setGuess();
   }
 
-  cardChoose(event) {
+  chooseCard(event) {
     if (this.hostChoosenCard !== undefined) {
       this.hostChoosenCard.classList.remove("choosen");
     }
-    this.hostChoosenCard = event.target;
-    event.target.classList.add("choosen");
+    if (this.hostChoosenCard !== event.target) {
+      this.hostChoosenCard = event.target;
+      event.target.classList.add("choosen");
+      this.updateGoBtn(true, this.hostGuess !== '');
+    }
+    else { 
+      this.hostChoosenCard = undefined;
+      this.updateGoBtn(false, this.hostGuess !== '');
+    }
   }
 
   gameWait() {
@@ -192,6 +211,19 @@ class ImApp extends LitElement {
     `;
   }
   
+  magnifyCard(event) {
+    console.log(event.target);
+    if (event.target.tagName === 'DIV') {
+      event.currentTarget.classList.remove("magnify");
+      event.currentTarget.classList.add("preview");
+    }
+    else if (event.target.tagName === 'IMG') {
+      event.currentTarget.classList.remove("preview");
+      event.currentTarget.classList.add("magnify");
+    }
+    else console.log("¯\\_(ツ)_/¯");
+  }
+
   async lobbyChecker() {
     if (this.checkLock === true) return;
     this.lobbyLock = true;

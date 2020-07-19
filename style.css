@@ -87,7 +87,7 @@ h1 {
 /*}*/
 
 .lobbyContainer .playerList .ready::before {
-  content: url("../images/ready2.svg");
+  content: url("img/ready2.svg");
   display: block;
   width: 20px;
   height: 20px;
@@ -358,11 +358,88 @@ h1 {
   width: 100%;
 }
 
-.leader .goButton {
+.gameContainer .goButton {
   border: none;
   background: #414181;
   color: #eee;
-  border-radius: 5px 5px 0 0;
+  border-radius: 1000px 1000px 0 0;
+  position: fixed;
+  bottom: 0;
+  left: calc(50% - 100px);
+  width: 220px;
+  height: 50px;
+  font-size: 30px;
+  transition: .1s;
+  z-index: 2;
+}
+
+.gameContainer .goButton.notReady {
+  filter: grayscale(1) brightness(0.6);
+  height: 40px;
+  opacity: .8;
+}
+
+.gameContainer .goButton.ready {
+  text-transform: uppercase;
+}
+
+.gameContainer .goButton.ready:before {
+    content: '';
+    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    position: absolute;
+    top: -2px;
+    left:-2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    border-radius: 1000px 1000px 0 0;
+}
+
+.gameContainer .goButton.ready:not(.yep):hover:after {
+    background: transparent;
+}
+
+.gameContainer .goButton.ready:before {
+    opacity: 1;
+}
+
+.gameContainer .goButton.ready:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    left: 0;
+    top: 0;
+    border-radius: 1000px 1000px 0 0;
+    transition: 1s;
+}
+
+.gameContainer .goButton.yep {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  border-radius: 0;
+  transition: 1s;
+}
+
+
+.gameContainer .goButton.yep:after,
+.gameContainer .goButton.yep:before {
+  border-radius: 0;
+  transition: 1s;
+}
+
+@keyframes glowing {
+  0% { background-position: 0 0; }
+  50% { background-position: 400% 0; }
+  100% { background-position: 0 0; }
 }
 
 button {
