@@ -52,7 +52,8 @@ class ImApp extends LitElement {
       hostCards: { type: Array }, //this session player's cards
       initLock: { type: Boolean }, //lock that prevents from multiple game init to exec
       hostChoosenCard: { type: Object },
-      hostGuess: { type: String },
+      leaderGuess: { type: String },
+      turnCards: { type: Array },
     };
   }
 
@@ -62,9 +63,10 @@ class ImApp extends LitElement {
     this.host = players[0];
     this.lobbyBtn = false;
     this.checkLock = false;
-    this.hostGuess = "";
-    this.state = "game guess";this.initGame();
+    this.leaderGuess = "";
+    //this.state = "game guess";this.initGame();
     //this.state = 'lobby';
+    this.state = 'game turn';this.initGameTurn(this.host, "what ever");
   }
 
   render() {
@@ -72,6 +74,7 @@ class ImApp extends LitElement {
       case 'lobby': this.lobbyChecker(); return this.lobby(); break;
       case 'game guess': this.gameChecker(); return this.gameGuess(); break;
       case 'game wait': this.gameChecker(); return this.gameWait(); break;
+      case 'game turn': this.gameChecker(); return this.gameTurn(); break;
       default: return html`not found`; 
     }
   }
@@ -91,9 +94,9 @@ class ImApp extends LitElement {
     this.gameLeader.status = 'guessing';
     this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
                        "card4.jpeg", "card5.jpeg"];
-    this.hostGuess = '';
-    this.initLock = false;
+    this.leaderGuess = '';
     this.updateGoBtn(false, false);
+    this.initLock = false;
   }
 
   gameDrawSidebar() {
@@ -128,7 +131,7 @@ class ImApp extends LitElement {
         </div>
         <div class="leaderControl" @keyup="${this.keyListener}">
           <input class="guessField" placeholder="Enter your guess"
-            value="${this.hostGuess}" @change="${this.updateGuess}">
+            value="${this.leaderGuess}" @change="${this.updateGuess}">
         </div>
         <hr class="leaderUnderline">
       </div>
@@ -142,6 +145,7 @@ class ImApp extends LitElement {
           </div>
         `)}
       </div>
+
       <button class="goButton ${this.gameGoBtn !== 'go' ? 'notReady' : 'ready'}"
         @click="${this.goBtnGo}">
         ${this.gameGoBtn}
@@ -150,17 +154,67 @@ class ImApp extends LitElement {
     `;
   }
 
+  gameDrawLeader() {
+    return html`
+    <div class="leader">
+      <div class="leaderWrap">
+        <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
+        <span class="leaderName">${this.gameLeader.name}</span>
+        <span class="playerScore">${this.gameLeader.score}</span>
+      </div>
+      <div class="leaderGuess">${this.leaderGuess}</div>
+      <hr class="leaderUnderline">
+    </div>
+    `;
+  }
+
+  async test() {
+    await sleep(500);
+    this.players[3].status = 'waiting';
+    this.requestUpdate()
+  }
+
+  initGameTurn(gameLeader, leaderGuess) {
+    this.gameLeader = gameLeader;
+    this.leaderGuess = leaderGuess;
+    this.players.map(player => player.status = 'picking');
+    this.gameLeader.status = 'waiting';
+
+    this.test();
+  }
+
+  gameTurn() {
+    return html`
+    <div class="gameContainer">
+      ${this.gameDrawSidebar()}
+      ${this.gameDrawLeader()}
+
+      <div class="cardsContainer">
+        ${this.players.map(player => html`
+          <div class="card ${player.status}">
+            <div class="wrap">
+              <img class="cardImage" src="../img/cardbacksmall.png">
+            </div>
+          </div>
+        `)}
+      </div>
+
+    </div>
+    `;
+  }
+
   async goBtnGo(event) {
     if (this.gameGoBtn === 'go') {
       event.currentTarget.classList.add('yep');
+      initGameTurn(this.hostPlayer, this.leaderGuess);
       await sleep(1500);
       this.state = 'game turn';
     }
   }
 
   updateGuess(event) {
-    this.hostGuess = event.target.value;
-    this.updateGoBtn(this.hostChoosenCard !== undefined, this.hostGuess !== '');
+    this.leaderGuess = event.target.value;
+    this.updateGoBtn(this.hostChoosenCard !== undefined, this.leaderGuess !== '');
   }
 
   setGuess() {
@@ -188,11 +242,11 @@ class ImApp extends LitElement {
     if (this.hostChoosenCard !== event.target) {
       this.hostChoosenCard = event.target;
       event.target.classList.add("choosen");
-      this.updateGoBtn(true, this.hostGuess !== '');
+      this.updateGoBtn(true, this.leaderGuess !== '');
     }
     else { 
       this.hostChoosenCard = undefined;
-      this.updateGoBtn(false, this.hostGuess !== '');
+      this.updateGoBtn(false, this.leaderGuess !== '');
     }
   }
 
