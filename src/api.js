@@ -29,6 +29,7 @@ export class Api {
   }
 
   incoming(data) {
+    console.log(data);
     let info = JSON.parse(data.data);
     this.handlers.get(info.type)[0](info.data);
   }

@@ -2,15 +2,14 @@ import { LitElement, html } from 'lit-element';
 import { Player } from './player.js';
 import { sleep } from './functions.js';
 import { Api } from './api.js'
-//import { sleep, shuffle } from  './functions.js';
 
  
 let players = [];
-//players.push(new Player("you", "0.png", "notReady", 0));
+players.push(new Player("you", "0.png", "notReady", 0));
 players.push(new Player("player1", "0.png", "notReady", 0));
-//players.push(new Player("player2", "0.png", "ready", 0));
-//players.push(new Player("player3", "0.png", "ready", 0));
-let api = new Api();
+players.push(new Player("player2", "0.png", "ready", 0));
+players.push(new Player("player3", "0.png", "ready", 0));
+const api = new Api();
 
 class ImApp extends LitElement {
   static get properties() {
@@ -18,7 +17,6 @@ class ImApp extends LitElement {
       state: { type: String }, //defines current application render and behavior
       players: { type: Array }, //all players array
       host: { type: Player },   //this session player
-      lobbyBtn: { type: Boolean }, //switcher for lobby ready button
       checkLock: { type: Boolean }, //lock that prevents run same async func multiple times
       gameLeader: { type: Player }, //current player who is guessing a card
       gameLeaderId: { type: Number }, //his ID in array of players in gameQueue
@@ -34,16 +32,23 @@ class ImApp extends LitElement {
   constructor() {
     super();
     this.players = players;
+    api.on('getHostCard', () => this.hostCard());
+    api.on('updatePlayers', (players) => { 
+      if (this.players.length < players.length) {
+        this.players = players;
+        this.players.forEach(player => player = Player.fromJSON(player));
+      }
+    });
     api.on('newPlayer', (player) => { 
-      //api.send('newPlayerUpdate', this.players);
-      const pl = Player.fromJSON(player);
       this.players.push(Player.fromJSON(player));
       this.requestUpdate();
+
+      api.send('updatePlayers', this.players);
     });
     
     this.host = players[0];
-    this.lobbyBtn = false;
     this.checkLock = false;
+    this.initLock = false;
     this.leaderGuess = "";
     this.state = 'lobby';
     //this.state = "game guess";this.initGameGuess();
@@ -264,15 +269,6 @@ class ImApp extends LitElement {
   gameWait() {
     return html`
     uh oh
-      <div class="leader">
-        <div class="leaderWrap">
-          <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
-          <span class="leaderName">${this.gameLeader.name}</span>
-          <span class="playerScore">${this.gameLeader.score}</span>
-        </div>
-        <span class="leaderGuess ${this.gameLeader.status}">${this.gameLeader.status}</span>
-      </div>
-
     `;
   }
   
@@ -337,10 +333,10 @@ class ImApp extends LitElement {
 
   lobbyReadyButton() {
     this.host.status = this.host.status === "ready" ? "notReady" : "ready";
-    //if delete this meaningless line of code nothing is gonna work/update.
-    this.lobbyBtn = !this.lobbyBtn; 
     if (this.players.filter(player => player.status === 'notReady').length === 0)
       this.initGameGuess();
+    else
+      this.requestUpdate();
   }
 
   createRenderRoot() { return this }
