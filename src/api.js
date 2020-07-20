@@ -6,6 +6,8 @@ function randInt() {
 
 export class Api {
   constructor() {
+    this.client = new Player
+      ("real player " + randInt(), "0.png", "notReady", 0);
     this.handlers = new Map()
 
     this.on = (type, handler) => {
@@ -17,15 +19,17 @@ export class Api {
       this.ws.send(JSON.stringify({ type, data }));
 
     this.ws = new WebSocket('ws://127.0.0.1:8081/');
-    this.ws.onopen = this.open;
+    this.ws.onopen = (event) => this.open();
+    this.ws.onclose = (event) => this.close();
     this.ws.onmessage = (data) => this.incoming(data);
   }
 
+  close() {
+    this.send('removePlayer', this.client);
+  }
+
   open() {
-    this.send(JSON.stringify({ 
-      type: "newPlayer", 
-      data: new Player("real player " + randInt(), "0.png", "notReady", 0),
-    }));
+    this.send('newPlayer', this.client);
   }
 
   incoming(data) {

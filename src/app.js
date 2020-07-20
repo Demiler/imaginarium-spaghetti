@@ -3,13 +3,12 @@ import { Player } from './player.js';
 import { sleep } from './functions.js';
 import { Api } from './api.js'
 
- 
 let players = [];
 players.push(new Player("you", "0.png", "notReady", 0));
 players.push(new Player("player1", "0.png", "notReady", 0));
 players.push(new Player("player2", "0.png", "ready", 0));
 players.push(new Player("player3", "0.png", "ready", 0));
-const api = new Api();
+//const api = new Api();
 
 class ImApp extends LitElement {
   static get properties() {
@@ -32,39 +31,67 @@ class ImApp extends LitElement {
   constructor() {
     super();
     this.players = players;
+    //this.setupApi();
+   
+    this.host = players[0];
+    this.checkLock = false;
+    this.initLock = false;
+    this.leaderGuess = "";
+    //this.state = 'wait pl';
+    //this.state = 'lobby';
+    //this.state = "game guess";this.initGameGuess();
+    //this.state = 'game turn';this.initGameTurn(this.host, "what ever");
+    this.state = 'game think';this.initGameThink(this.host, "what ever");
+  }
+
+  render() {
+    switch (this.state) {
+      case 'wait pl': this.waitPlease(); return html``; break;
+      case 'lobby': this.lobbyChecker(); return this.lobby(); break;
+      case 'game guess': return this.gameGuess(); break;
+      case 'game wait': return this.gameWait(); break;
+      case 'game turn': this.gameTurnChecker(); return this.gameTurn(); break;
+      case 'game think': this.gameThinkChecker(); return this.gameThink(); break;
+      default: return html`not found`; 
+    }
+  }
+
+  setupApi() {
+    this.apiRef = api;
     api.on('getHostCard', () => this.hostCard());
     api.on('updatePlayers', (players) => { 
       if (this.players.length < players.length) {
-        this.players = players;
-        this.players.forEach(player => player = Player.fromJSON(player));
+        for (let i = 0; i < players.length; i++)
+          players[i] = Player.fromJSON(players[i]);
+        this.players = players.slice();
       }
     });
+
     api.on('newPlayer', (player) => { 
       this.players.push(Player.fromJSON(player));
       this.requestUpdate();
 
       api.send('updatePlayers', this.players);
     });
-    
-    this.host = players[0];
-    this.checkLock = false;
-    this.initLock = false;
-    this.leaderGuess = "";
-    this.state = 'lobby';
-    //this.state = "game guess";this.initGameGuess();
-    //this.state = 'game turn';this.initGameTurn(this.host, "what ever");
-    //this.state = 'game think';this.initGameThink();
-  }
 
-  render() {
-    switch (this.state) {
-      case 'lobby': this.lobbyChecker(); return this.lobby(); break;
-      case 'game guess': return this.gameGuess(); break;
-      case 'game wait': return this.gameWait(); break;
-      case 'game turn': this.gameTurnChecker(); return this.gameTurn(); break;
-      case 'game think': return this.gameThink(); break;
-      default: return html`not found`; 
-    }
+    api.on('removePlayer', (player) => {
+      player = Player.fromJSON(player);
+      console.log(player);
+      console.log(this.players);
+      this.players = this.players.filter(pl => pl.name !== player.name);
+      console.log('here boi');
+      console.log(this.players);
+    });
+    window.addEventListener('beforeunload', () => 
+      api.send('removePlayer', api.client));
+   }
+
+  async waitPlease() {
+    while (
+      this.players.length === 0
+    ) await sleep(500);
+    this.state = 'lobby';
+    this.host = players[0];
   }
 
   gameDrawSidebar() {
@@ -100,15 +127,69 @@ class ImApp extends LitElement {
     `;
   }
 
-  initGameThink() {
+  initGameResult() {
+  }
+
+  async gameThinkChecker() {
+    if (this.checkLock === true) return;
+    this.checkLock = true;
+    while (
+      this.players.filter(player => player.status === 'thinking').length !== 0
+    ) await sleep(500);
+    await sleep(1000);
+    this.initGameResult();
+    this.state = 'game result';
+    this.checkLock = false;
+  }
+
+  async test2() {
+    await sleep(1000);
+    this.players[2].status = "waiting";
+    this.requestUpdate();
+
+    await sleep(500);
+    this.players[1].status = "waiting";
+    this.requestUpdate();
+
+    await sleep(500);
+    this.players[3].status = "waiting";
+    this.requestUpdate();
+  }
+
+  initGameThink(leader, guess) {
+    this.gameLeader = leader;
+    this.leaderGuess = guess;
+    this.players.forEach(player => player.status = "thinking");
+    this.host.status = "waiting";
+    this.turnCards = [ "card0.jpeg", "card1.jpeg", "card3.jpeg", "card2.jpeg" ];
+
+    this.test2();
   }
 
   gameThink() {
     return html`
     <div class="gameContainer">
       ${this.gameDrawSidebar()}
+      ${this.gameDrawLeader()}
+
+      <div class="cardsContainer">
+        ${this.turnCards.map(card => html`
+          <div class="card preview" @click="${this.guessCard}">
+            <div class="wrap">
+              <img class="cardImage" src="../img/cards/${card}">
+            </div>
+          </div>
+        `)}
+      </div>
+
+
     </div>
     `;
+  }
+
+  guessCard(event) {
+    if (this.gameLeader !== this.host)
+      this.chooseCard(event);
   }
 
   initGameGuess() {
@@ -332,6 +413,7 @@ class ImApp extends LitElement {
   }
 
   lobbyReadyButton() {
+    this.host = this.players[0];
     this.host.status = this.host.status === "ready" ? "notReady" : "ready";
     if (this.players.filter(player => player.status === 'notReady').length === 0)
       this.initGameGuess();
