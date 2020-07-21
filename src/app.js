@@ -36,12 +36,16 @@ class ImApp extends LitElement {
     this.host = players[0];
     this.checkLock = false;
     this.initLock = false;
-    this.leaderGuess = "";
+
+    this.gameLeader = this.host;
+    this.leaderGuess = 'what ever';
+
     //this.state = 'wait pl';
     //this.state = 'lobby';
     //this.state = "game guess";this.initGameGuess();
     //this.state = 'game turn';this.initGameTurn(this.host, "what ever");
-    this.state = 'game think';this.initGameThink(this.host, "what ever");
+    //this.state = 'game think';this.initGameThink(this.host, "what ever");
+    this.state = 'game result';this.initGameResult();
   }
 
   render() {
@@ -130,23 +134,47 @@ class ImApp extends LitElement {
 
   async initGameResult() {
     this.turnCards = [ "card0.jpeg", "card1.jpeg", "card3.jpeg", "card2.jpeg" ];
-    this.playersChoose = [ 
-      { player: this.players[0], card: this.turnCards[1] },
-      { player: this.players[1], card: this.turnCards[0] },
-      { player: this.players[2], card: this.turnCards[1] },
-      { player: this.players[3], card: this.turnCards[2] },
+
+    this.leaderCard = this.turnCards[2];
+    this.playersChoose = [
+      { card: this.turnCards[0], own: this.players[1], 
+        players: [this.players[1], this.players[3]] },
+
+      { card: this.turnCards[1], own: this.players[2], players: [] },
+      { card: this.turnCards[2], own: this.players[0], players: [this.players[2]] },
+      { card: this.turnCards[3], own: this.players[3], players: [] },
     ];
 
+    this.players.map(player => player.status = 'watching');
+
     await sleep(10000);  
-    this.gameTurnInit();
+    this.initGameTurn();
   }
 
   gameResult() {
     return html`
-      ${this.gameDrawSidebar()}
-      ${this.gameDrawLeader()}
+      <div class="gameContainer">
+        ${this.gameDrawSidebar()}
+        ${this.gameDrawLeader()}
 
-      <div class="cardsContainer">
+        <div class="cardsContainer">
+          ${this.playersChoose.map(choose => html`
+            <div class="card preview ${
+              choose.card === this.leaderCard ? "leader" : "common"}">
+              <div class="wrap">
+                <img class="cardImage" src="../img/cards/${choose.card}">
+                <img class="cardOwner" src="../img/avatars/${choose.own.icon}">
+                <div class="pickedPlayers">
+                  ${choose.players.map(player => html`
+                    <img class="pickedPlayer" src="../img/avatars/${player.icon}">
+                  `)}
+              </div>
+              </div>
+            </div>
+          `)}
+        </div>
+
+
       </div>
     `;
   }
