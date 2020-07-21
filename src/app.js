@@ -52,6 +52,7 @@ class ImApp extends LitElement {
       case 'game wait': return this.gameWait(); break;
       case 'game turn': this.gameTurnChecker(); return this.gameTurn(); break;
       case 'game think': this.gameThinkChecker(); return this.gameThink(); break;
+      case 'game result': return this.gameResult();
       default: return html`not found`; 
     }
   }
@@ -127,7 +128,27 @@ class ImApp extends LitElement {
     `;
   }
 
-  initGameResult() {
+  async initGameResult() {
+    this.turnCards = [ "card0.jpeg", "card1.jpeg", "card3.jpeg", "card2.jpeg" ];
+    this.playersChoose = [ 
+      { player: this.players[0], card: this.turnCards[1] },
+      { player: this.players[1], card: this.turnCards[0] },
+      { player: this.players[2], card: this.turnCards[1] },
+      { player: this.players[3], card: this.turnCards[2] },
+    ];
+
+    await sleep(10000);  
+    this.gameTurnInit();
+  }
+
+  gameResult() {
+    return html`
+      ${this.gameDrawSidebar()}
+      ${this.gameDrawLeader()}
+
+      <div class="cardsContainer">
+      </div>
+    `;
   }
 
   async gameThinkChecker() {
@@ -192,21 +213,49 @@ class ImApp extends LitElement {
       this.chooseCard(event);
   }
 
+  initGame() {
+    if (this.initLock === true) return;
+    this.initLock = true;
+
+    this.gameQueue = this.players.slice();
+    shuffle(this.gameQueue);
+    this.gameQueue.map(player => player.status = 'waiting');
+    this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
+                       "card4.jpeg", "card5.jpeg"];
+    this.initLock = false;
+    this.initGameTurn();
+  }
+
+  initGameTurn() {
+    if (this.initLock === true) return;
+    this.initLock = true;
+    this.gameLeaderId++;
+    if (this.gameLeaderId >= this.gameQueue.length)
+      this.gameLeaderId = 0;
+    this.gameLeader = this.gameQueue[this.gameLeaderId];
+
+    this.leaderGuess = '';
+    this.gameLeader.status = 'guessing';
+
+    this.initLock = false;
+    if (this.gameLeader === this.host) {
+      this.initGameGuess();
+      this.state = 'game guess';
+    }
+    else {
+      this.initGameWait();
+      this.state = 'game wait';
+    }
+  }
+
+  initGameWait() {
+  }
+
   initGameGuess() {
     if (this.initLock === true) return;
     this.initLock = true;
-    this.gameQueue = this.players.slice();
-    //shuffle(this.gameQueue);
-    this.gameQueue.map(player => player.status = 'waiting');
-    this.gameLeaderId = 0;
-    this.gameLeader = this.gameQueue[0];
-    this.state = this.gameLeader === this.host ? 'game guess' : 'game wait';
-    this.gameLeader.status = 'guessing';
-    this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
-                       "card4.jpeg", "card5.jpeg"];
-    this.leaderGuess = '';
     this.updateGoBtn(false, false);
-    this.initLock = false;
+    his.initLock = false;
   }
 
   gameGuess() {
@@ -372,7 +421,7 @@ class ImApp extends LitElement {
     while (
       this.players.filter(player => player.status === 'notReady').length !== 0
     ) await sleep(500);
-    this.initGameGuess();
+    this.initGame();
     this.checkLock = false;
   }
 
@@ -416,7 +465,7 @@ class ImApp extends LitElement {
     this.host = this.players[0];
     this.host.status = this.host.status === "ready" ? "notReady" : "ready";
     if (this.players.filter(player => player.status === 'notReady').length === 0)
-      this.initGameGuess();
+      this.initGame();
     else
       this.requestUpdate();
   }
