@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element'; 
 import { Player } from './player.js';
-import { sleep } from './functions.js';
+import { sleep, shuffle } from './functions.js';
 import { Api } from './api.js'
 
 let players = [];
@@ -40,12 +40,15 @@ class ImApp extends LitElement {
     this.gameLeader = this.host;
     this.leaderGuess = 'what ever';
 
+    this.initGame();
     //this.state = 'wait pl';
     //this.state = 'lobby';
     //this.state = "game guess";this.initGameGuess();
-    //this.state = 'game turn';this.initGameTurn(this.host, "what ever");
-    //this.state = 'game think';this.initGameThink(this.host, "what ever");
-    this.state = 'game result';this.initGameResult();
+    //this.state = 'game turn';this.initGameTurn();
+    //this.state = 'game think';this.initGameThink();
+    //this.state = 'game result';this.initGameResult();
+    //this.state = 'game wait'; this.initGameWait();
+    this.state = 'game pick'; this.initGamePick();
   }
 
   render() {
@@ -57,6 +60,7 @@ class ImApp extends LitElement {
       case 'game turn': this.gameTurnChecker(); return this.gameTurn(); break;
       case 'game think': this.gameThinkChecker(); return this.gameThink(); break;
       case 'game result': return this.gameResult();
+      case 'game pick': this.gamePickChecker(); return this.gamePick(); break;
       default: return html`not found`; 
     }
   }
@@ -132,7 +136,14 @@ class ImApp extends LitElement {
     `;
   }
 
-  async initGameResult() {
+  async gameResultCountDown() {
+    for (let i = 0; i < 5; i++) {
+      await sleep(1000);
+    }
+    this.initGameIteration();
+  }
+
+  initGameResult() {
     this.turnCards = [ "card0.jpeg", "card1.jpeg", "card3.jpeg", "card2.jpeg" ];
 
     this.leaderCard = this.turnCards[2];
@@ -146,9 +157,7 @@ class ImApp extends LitElement {
     ];
 
     this.players.map(player => player.status = 'watching');
-
-    await sleep(10000);  
-    this.initGameTurn();
+    this.gameResultCountDown();
   }
 
   gameResult() {
@@ -173,8 +182,6 @@ class ImApp extends LitElement {
             </div>
           `)}
         </div>
-
-
       </div>
     `;
   }
@@ -205,9 +212,7 @@ class ImApp extends LitElement {
     this.requestUpdate();
   }
 
-  initGameThink(leader, guess) {
-    this.gameLeader = leader;
-    this.leaderGuess = guess;
+  initGameThink() {
     this.players.forEach(player => player.status = "thinking");
     this.host.status = "waiting";
     this.turnCards = [ "card0.jpeg", "card1.jpeg", "card3.jpeg", "card2.jpeg" ];
@@ -246,15 +251,17 @@ class ImApp extends LitElement {
     this.initLock = true;
 
     this.gameQueue = this.players.slice();
-    shuffle(this.gameQueue);
+    //shuffle(this.gameQueue);
     this.gameQueue.map(player => player.status = 'waiting');
     this.hostCards = [ "card0.jpeg", "card1.jpeg", "card2.jpeg", "card3.jpeg",
                        "card4.jpeg", "card5.jpeg"];
     this.initLock = false;
-    this.initGameTurn();
+    //this.gameLeaderId = -1;
+    this.gameLeaderId = 0;
+    this.initGameIteration();
   }
 
-  initGameTurn() {
+  initGameIteration() {
     if (this.initLock === true) return;
     this.initLock = true;
     this.gameLeaderId++;
@@ -276,14 +283,115 @@ class ImApp extends LitElement {
     }
   }
 
-  initGameWait() {
+  async playersPickingEmulator() {
+    const wait = [ 2000, 600, 1000, 500 ];
+    for (let i = 0; i < 4; i++) {
+      if (this.gameLeaderId !== i && this.players[i] !== this.host) {
+        await sleep(wait[i]);
+        this.players[i].status = 'waiting';
+        this.requestUpdate();
+      }
+    }
   }
+
+  async gamePickChecker() {
+    if (this.checkLock === true) return;
+    this.checkLock = true;
+    while (
+      this.players.filter(player => player.status === 'picking').length !== 0
+    ) await sleep(500);
+    await sleep(1000);
+    this.initGameTurn();
+    this.state = 'game turn';
+    this.checkLock = false;
+  }
+
+  initGamePick() {
+    this.players.map(player => player.status = 'picking');
+    this.gameLeader.status = 'waiting';
+  }
+
+  gamePick() {
+    return html`
+    <div class="gameContainer">
+      ${this.gameDrawSidebar()}
+      ${this.gameDrawLeader()}
+      
+      <div class="cardsContainer">
+        ${this.hostCards.map(card => html`
+          <div class="card preview" @click="${this.chooseCard}">
+            <div class="wrap">
+              <img class="cardImage" src="../img/cards/${card}">
+            </div>
+          </div>
+        `)}
+      </div>
+
+      <button class="pickButton ${
+        this.hostChoosenCard !== undefined ? 'ready' : 'notReady'
+      }" @click="${this.pickBtnpick}">
+        ${this.hostChoosenCard !== undefined ? 'go' : 'pick a card'}
+      </button>
+
+    </div>
+    `;
+  }
+
+  async pickBtnpick(event) {
+    if (this.hostChoosenCard !== undefined) {
+      event.currentTarget.classList.add('yep');
+      this.host.status = 'waiting';
+      this.initGameTurn();
+      await sleep(1500);
+      this.state = 'game turn';
+    }
+  }
+
+  async leaderEmulator() {
+    await sleep(1500);
+    this.leaderGuess = 'whatever';
+    this.initGamePick();
+    this.state = 'game pick';
+  }
+
+  initGameWait() {
+    this.leaderEmulator();
+  }
+
+  gameWait() {
+    return html`
+    <div class="gameContainer">
+      ${this.gameDrawSidebar()}
+
+      <div class="leader">
+        <div class="leaderWrap">
+          <img class="leaderImage" src="../img/avatars/${this.gameLeader.icon}">
+          <span class="leaderName">${this.gameLeader.name}</span>
+          <span class="playerScore">${this.gameLeader.score}</span>
+        </div>
+        <div class="leaderStatus">${this.gameLeader.status}</div>
+        <hr class="leaderUnderline">
+      </div>
+
+      <div class="cardsContainer">
+        ${this.hostCards.map(card => html`
+          <div class="card preview">
+            <div class="wrap">
+              <img class="cardImage" src="../img/cards/${card}">
+            </div>
+          </div>
+        `)}
+      </div>
+    </div>
+    `;
+  }
+  
 
   initGameGuess() {
     if (this.initLock === true) return;
     this.initLock = true;
     this.updateGoBtn(false, false);
-    his.initLock = false;
+    this.initLock = false;
   }
 
   gameGuess() {
@@ -323,24 +431,35 @@ class ImApp extends LitElement {
   }
 
   async test() {
-    await sleep(500);
-    this.players[3].status = 'waiting';
-    this.requestUpdate()
+    if (this.gameLeader === this.host) {
+      await sleep(500);
+      this.players[3].status = 'waiting';
+      this.requestUpdate()
 
-    await sleep(500);
-    this.players[1].status = 'waiting';
-    this.requestUpdate()
+      await sleep(500);
+      this.players[1].status = 'waiting';
+      this.requestUpdate()
 
-    await sleep(1000);
-    this.players[2].status = 'waiting';
-    this.requestUpdate()
+      await sleep(1000);
+      this.players[2].status = 'waiting';
+      this.requestUpdate()
+    } else {
+      await sleep(5000);
+      await sleep(500);
+      this.players[2].status = 'waiting';
+      this.requestUpdate()
+
+      await sleep(500);
+      this.players[3].status = 'waiting';
+      this.requestUpdate()
+    }
   }
 
-  initGameTurn(gameLeader, leaderGuess) {
-    this.gameLeader = gameLeader;
-    this.leaderGuess = leaderGuess;
-    this.players.map(player => player.status = 'picking');
-    this.gameLeader.status = 'waiting';
+  initGameTurn() {
+    if (this.gameLeader === this.host) {
+      this.players.map(player => player.status = 'picking');
+      this.gameLeader.status = 'waiting';
+    }
 
     this.test();
   }
@@ -424,12 +543,6 @@ class ImApp extends LitElement {
     }
   }
 
-  gameWait() {
-    return html`
-    uh oh
-    `;
-  }
-  
   magnifyCard(event) {
     console.log(event.target);
     if (event.target.tagName === 'DIV') {
